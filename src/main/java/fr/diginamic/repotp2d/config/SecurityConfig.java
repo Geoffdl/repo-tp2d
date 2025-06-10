@@ -11,9 +11,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * Configuration Spring security
+ */
 @Configuration
 public class SecurityConfig
 {
+    /**
+     * Configuration des accès
+     * @param http   base de notre web serveur
+     * @param filter filter JWT
+     * @return configuration http
+     * @throws Exception en cas d'erreur
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter filter) throws Exception
     {

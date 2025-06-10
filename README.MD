@@ -1,3 +1,6 @@
+### application.properties
+
+```
 spring.application.name = repo-tp2d
 spring.datasource.url = jdbc:h2:mem:test
 spring.datasource.driver-class-name = org.h2.Driver
@@ -13,3 +16,4 @@ jwt.expires_in = 7200
 jwt.secret = maSuperCleSecrete123maSuperCleSecrete123
 
 jwt.cookie = AUTH-TOKEN
+```

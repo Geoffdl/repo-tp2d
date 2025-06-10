@@ -10,24 +10,47 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller principal de notre app
+ */
 @RestController
 public class AppController
 {
+    /**
+     * service d'authentification
+     */
     @Autowired
     private AuthService authService;
     
+    /**
+     * route uniquement accessible aux utilisateurs connectés
+     * @return "hi"
+     */
     @GetMapping({"/hello"})
     public String sayHi()
     {
         return "hi";
     }
     
+    /**
+     * route de login
+     * Si les identifiants correspondent aux identifiants en base, un cookie de validation est retourné dans le header de la requête.
+     * @param userApp json au format UserApp (username, mdp)
+     * @return réponse serveur
+     * @throws ProblemException erreur en cas d'identifiant mismatch
+     */
     @PostMapping({"/login"})
     public ResponseEntity<String> logUser(@RequestBody UserApp userApp) throws ProblemException
     {
         return authService.loginUser(userApp);
     }
     
+    /**
+     * route d'inscription
+     * @param userApp json au format UserApp (username, mdp)
+     * @return réponse serveur
+     * @throws ProblemException erreur si l'identifiant existe déjà en base
+     */
     @PostMapping({"/register"})
     public ResponseEntity<String> registerUser(@RequestBody UserApp userApp) throws ProblemException
     {

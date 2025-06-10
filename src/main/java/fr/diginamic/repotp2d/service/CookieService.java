@@ -2,27 +2,35 @@ package fr.diginamic.repotp2d.service;
 
 import fr.diginamic.repotp2d.security.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
-@Deprecated
+
 public class CookieService
 {
+    /**
+     * jwt service
+     */
     @Autowired
     private JwtService jwtService;
     
-    public ResponseEntity<String> getCookies()
+    /**
+     * cookie name
+     */
+    @Value("${jwt.cookie}")
+    private String COOKIE_NAME;
+    
+    /**
+     * Genere un cookie pour un utilisateur se connectant
+     * @param userName nom utilisateur
+     * @return cookie d'identification
+     */
+    public ResponseCookie getCookie(String userName)
     {
-        String cookieName = "tp2d";
-        
-        String jwt = jwtService.getToken("dev@fake.com");
-        
-        ResponseCookie tokenCookie = ResponseCookie.from(cookieName, jwt)
-                                                   .build();
-        
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, tokenCookie.toString()).body("miam");
+        String jwt = jwtService.getToken(userName);
+        return ResponseCookie.from(COOKIE_NAME, jwt)
+                             .build();
     }
 }

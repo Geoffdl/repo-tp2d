@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 import java.security.SignatureException;
 import java.util.Date;
 
+/**
+ * Service pour opérations liées aux JWT
+ */
 @Component
 public class JwtService
 {
@@ -23,6 +26,11 @@ public class JwtService
     @Value("${jwt.expires_in}")
     private long EXPIRE_IN;
     
+    /**
+     * Crée un jwt a partir d'un username
+     * @param subject sujet
+     * @return jwt token
+     */
     public String getToken(String subject)
     {
         return Jwts.builder()
@@ -33,6 +41,12 @@ public class JwtService
                    .compact();
     }
     
+    /**
+     * Methode pour décrypter un token jwt
+     * @param token token jwt
+     * @return liste de claims liées au token
+     * @throws SignatureException erreur token
+     */
     public Claims decodeToken(String token) throws SignatureException
     {
         return Jwts.parser()
@@ -42,6 +56,11 @@ public class JwtService
                    .getBody();
     }
     
+    /**
+     * Valide si le token est déchiffrable par notre clef
+     * @param token jwt token
+     * @return true si le token est valide
+     */
     public boolean isTokenValid(String token)
     {
         try
