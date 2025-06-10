@@ -7,7 +7,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,17 +22,12 @@ public class JwtFilter extends OncePerRequestFilter
 {
     private final String SECRET = "maSuperCleSecrete123maSuperCleSecrete123";
     
-    @Autowired
-    JwtService service;
-    
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
           FilterChain filterChain) throws ServletException, IOException
     {
-        
         if (request.getCookies() != null)
         {
-            
             Stream.of(request.getCookies())
                   .filter(cookie -> cookie.getName().equals("tp2d"))
                   .map(Cookie::getValue)
@@ -48,12 +42,10 @@ public class JwtFilter extends OncePerRequestFilter
                                                        .getBody();
                                    
                                    String username = claims.getSubject();
-                                   UsernamePasswordAuthenticationToken auth =
-                                         new UsernamePasswordAuthenticationToken(
-                                               username,
-                                               null,
-                                               List.of(new SimpleGrantedAuthority("ROLE_USER"))
-                                         );
+                                   UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                                         username,
+                                         null,
+                                         List.of(new SimpleGrantedAuthority("ROLE_USER")));
                                    SecurityContextHolder.getContext().setAuthentication(auth);
                                }
                                catch (Exception e)
@@ -62,7 +54,6 @@ public class JwtFilter extends OncePerRequestFilter
                                }
                            });
         }
-        
         filterChain.doFilter(request, response);
     }
 }

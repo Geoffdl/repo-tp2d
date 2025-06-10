@@ -61,4 +61,12 @@ public class CustomUserDetailService implements UserDetailsService
         UserApp newUser = new UserApp(username, passwordEncoder.encode(password));
         return repository.save(newUser);
     }
+    
+    public void verifyPassword(UserDetails userDetails, UserApp userApp) throws ProblemException
+    {
+        if (!passwordEncoder.matches(userApp.getPassword(), userDetails.getPassword()))
+        {
+            throw new ProblemException("mot de passe incorrect");
+        }
+    }
 }
