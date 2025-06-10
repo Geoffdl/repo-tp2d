@@ -3,7 +3,6 @@ package fr.diginamic.repotp2d.controller;
 import fr.diginamic.repotp2d.entity.UserApp;
 import fr.diginamic.repotp2d.exception.ProblemException;
 import fr.diginamic.repotp2d.service.AuthService;
-import fr.diginamic.repotp2d.service.CookieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,19 +15,11 @@ public class AppController
 {
     @Autowired
     private AuthService authService;
-    @Autowired
-    private CookieService cookieService;
     
     @GetMapping({"/hello"})
     public String sayHi()
     {
         return "hi";
-    }
-    
-    @GetMapping({"/get-cookie"})
-    public ResponseEntity<String> getCookie()
-    {
-        return cookieService.getCookies();
     }
     
     @PostMapping({"/login"})
