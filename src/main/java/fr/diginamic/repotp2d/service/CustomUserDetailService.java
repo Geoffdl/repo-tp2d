@@ -18,9 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class CustomUserDetailService implements UserDetailsService
 {
+    /**
+     * user jpa repository
+     */
     @Autowired
     private UserAppRepository repository;
-    
+    /**
+     * encryption de mot de passe
+     */
     @Autowired
     private PasswordEncoder passwordEncoder;
     
@@ -60,5 +65,19 @@ public class CustomUserDetailService implements UserDetailsService
         
         UserApp newUser = new UserApp(username, passwordEncoder.encode(password));
         return repository.save(newUser);
+    }
+    
+    /**
+     * Vérifie sur le mdp fourni correspond en base (avec encryption)
+     * @param userDetails utilisateur accédant à la requête
+     * @param userApp     entite JPA
+     * @throws ProblemException erreur en cas de mismatch mdp
+     */
+    public void verifyPassword(UserDetails userDetails, UserApp userApp) throws ProblemException
+    {
+        if (!passwordEncoder.matches(userApp.getPassword(), userDetails.getPassword()))
+        {
+            throw new ProblemException("mot de passe incorrect");
+        }
     }
 }

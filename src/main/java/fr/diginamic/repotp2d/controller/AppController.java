@@ -2,68 +2,58 @@ package fr.diginamic.repotp2d.controller;
 
 import fr.diginamic.repotp2d.entity.UserApp;
 import fr.diginamic.repotp2d.exception.ProblemException;
-import fr.diginamic.repotp2d.repository.UserAppRepository;
-import fr.diginamic.repotp2d.security.JwtService;
-import fr.diginamic.repotp2d.service.CustomUserDetailService;
+import fr.diginamic.repotp2d.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller principal de notre app
+ */
 @RestController
 public class AppController
 {
+    /**
+     * service d'authentification
+     */
     @Autowired
-    private JwtService jwtService;
-    @Autowired
-    private CustomUserDetailService userDetailService;
-    @Autowired
-    private UserAppRepository repository;
+    private AuthService authService;
     
+    /**
+     * route uniquement accessible aux utilisateurs connectés
+     * @return "hi"
+     */
     @GetMapping({"/hello"})
     public String sayHi()
     {
         return "hi";
     }
     
-    @GetMapping({"/get-cookie"})
-    public ResponseEntity<String> getCookie()
-    {
-        String cookieName = "tp2d";
-        
-        String jwt = jwtService.getToken("dev@fake.com");
-        
-        ResponseCookie tokenCookie = ResponseCookie.from(cookieName, jwt)
-                                                   .build();
-        
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, tokenCookie.toString()).body("miam");
-    }
-    
+    /**
+     * route de login
+     * Si les identifiants correspondent aux identifiants en base, un cookie de validation est retourné dans le header de la requête.
+     * @param userApp json au format UserApp (username, mdp)
+     * @return réponse serveur
+     * @throws ProblemException erreur en cas d'identifiant mismatch
+     */
     @PostMapping({"/login"})
     public ResponseEntity<String> logUser(@RequestBody UserApp userApp) throws ProblemException
     {
-        if (repository.findByUserName(userApp.getUserName()).isEmpty())
-        {
-            throw new ProblemException("aucun utilisateur trouvé");
-        }
-        
-        String cookieName = "tp2d";
-        String jwt = jwtService.getToken(userApp.getUserName());
-        
-        ResponseCookie tokenCookie = ResponseCookie.from(cookieName, jwt).build();
-        
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, tokenCookie.toString())
-                             .body("bonjour " + userApp.getUserName());
+        return authService.loginUser(userApp);
     }
     
+    /**
+     * route d'inscription
+     * @param userApp json au format UserApp (username, mdp)
+     * @return réponse serveur
+     * @throws ProblemException erreur si l'identifiant existe déjà en base
+     */
     @PostMapping({"/register"})
     public ResponseEntity<String> registerUser(@RequestBody UserApp userApp) throws ProblemException
     {
-        userDetailService.registerUser(userApp.getUserName(), userApp.getPassword());
-        return ResponseEntity.ok().body("bienvenue");
+        return authService.registerUser(userApp);
     }
 }
