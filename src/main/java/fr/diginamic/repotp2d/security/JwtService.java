@@ -2,10 +2,11 @@ package fr.diginamic.repotp2d.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.security.SignatureException;
 import java.util.Date;
 
@@ -26,6 +27,11 @@ public class JwtService
     @Value("${jwt.expires_in}")
     private long EXPIRE_IN;
     
+    private SecretKey getSecuredKey()
+    {
+        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    }
+    
     /**
      * Crée un jwt a partir d'un username
      * @param subject sujet
@@ -34,10 +40,10 @@ public class JwtService
     public String getToken(String subject)
     {
         return Jwts.builder()
-                   .setSubject(subject)
-                   .setIssuedAt(new Date())
-                   .setExpiration(new Date(System.currentTimeMillis() + 1000 * EXPIRE_IN))
-                   .signWith(SignatureAlgorithm.HS256, SECRET_KEY.getBytes())
+                   .subject(subject)
+                   .issuedAt(new Date())
+                   .expiration(new Date(System.currentTimeMillis() + 1000 * EXPIRE_IN))
+                   .signWith(getSecuredKey())
                    .compact();
     }
     
@@ -50,10 +56,10 @@ public class JwtService
     public Claims decodeToken(String token) throws SignatureException
     {
         return Jwts.parser()
-                   .setSigningKey(SECRET_KEY.getBytes())
+                   .verifyWith(getSecuredKey())
                    .build()
-                   .parseClaimsJws(token)
-                   .getBody();
+                   .parseSignedClaims(token)
+                   .getPayload();
     }
     
     /**
@@ -66,9 +72,9 @@ public class JwtService
         try
         {
             Jwts.parser()
-                .setSigningKey(SECRET_KEY.getBytes())
+                .verifyWith(getSecuredKey())
                 .build()
-                .parseClaimsJws(token);
+                .parseSignedClaims(token);
             return true;
         }
         catch (Exception e)
