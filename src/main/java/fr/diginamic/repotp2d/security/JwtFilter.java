@@ -1,7 +1,6 @@
 package fr.diginamic.repotp2d.security;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -9,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,11 +25,7 @@ import java.util.stream.Stream;
 @Service
 public class JwtFilter extends OncePerRequestFilter
 {
-    /**
-     * secretKey
-     */
-    @Value("${jwt.secret}")
-    private String SECRET_KEY;
+    
     /**
      * cookie name
      */
@@ -43,8 +39,8 @@ public class JwtFilter extends OncePerRequestFilter
     private JwtService jwtService;
     
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-          FilterChain filterChain) throws ServletException, IOException
+    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,
+          @NonNull FilterChain filterChain) throws ServletException, IOException
     {
         if (request.getCookies() != null)
         {
@@ -55,11 +51,7 @@ public class JwtFilter extends OncePerRequestFilter
                            {
                                if (jwtService.isTokenValid(token))
                                {
-                                   Claims claims = Jwts.parser()
-                                                       .setSigningKey(SECRET_KEY.getBytes())
-                                                       .build()
-                                                       .parseClaimsJws(token)
-                                                       .getBody();
+                                   Claims claims = jwtService.decodeToken(token);
                                    
                                    String username = claims.getSubject();
                                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(

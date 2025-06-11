@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.security.SignatureException;
 import java.util.Date;
 
 /**
@@ -51,9 +50,8 @@ public class JwtService
      * Methode pour décrypter un token jwt
      * @param token token jwt
      * @return liste de claims liées au token
-     * @throws SignatureException erreur token
      */
-    public Claims decodeToken(String token) throws SignatureException
+    public Claims decodeToken(String token)
     {
         return Jwts.parser()
                    .verifyWith(getSecuredKey())
