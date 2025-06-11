@@ -33,7 +33,7 @@ public class SecurityConfig
               .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
               .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
               .authorizeHttpRequests(auth -> auth
-                                           .requestMatchers("/login", "/register", "/h2-console/**").permitAll()
+                                           .requestMatchers("/auth/login", "/auth/register", "/h2-console/**", "/hello/public").permitAll()
                                            .anyRequest().authenticated()
                                     )
               .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
