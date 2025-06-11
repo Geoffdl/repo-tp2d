@@ -4,6 +4,7 @@ import fr.diginamic.repotp2d.security.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,11 +29,11 @@ public class SecurityConfig
     public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter filter) throws Exception
     {
         http
-              .csrf(csrf -> csrf.disable())
+              .csrf(AbstractHttpConfigurer::disable)
               .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
               .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
               .authorizeHttpRequests(auth -> auth
-                                           .requestMatchers("/login", "/register", "/get-cookie", "/h2-console/**").permitAll()
+                                           .requestMatchers("/login", "/register", "/h2-console/**").permitAll()
                                            .anyRequest().authenticated()
                                     )
               .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
